@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "220426031329",
+    "firebase_url": "https://tune-rater.firebaseio.com",
+    "project_id": "tune-rater",
+    "storage_bucket": "tune-rater.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220426031329:android:afdd1af92f740e7b78a7a0",
+        "android_client_info": {
+          "package_name": "edu.cpp.thestephent.tune_rater"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "220426031329-80tqjtlsei3sna9r4rbhs9them3rl5vc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSSUoDszpNj6hD6kLT-h8iY_zj5Wqi-ac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "220426031329-80tqjtlsei3sna9r4rbhs9them3rl5vc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
