@@ -5,13 +5,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
@@ -22,7 +20,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
-
   final String title;
 
   @override
@@ -30,7 +27,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   var emailController = TextEditingController();
   var passController = TextEditingController();
   String signinError = "";
@@ -38,19 +34,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-
-
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color.fromARGB(51, 51, 51, 0),
       body: Center(
-
         child: Column(
-
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
 //            Text(
@@ -63,23 +53,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Text(
-                      "E-mail: ",
-                        style: GoogleFonts.mukta(color: Colors.white, fontSize: 17,)
-                    ),
+                    Text("E-mail: ",
+                        style: GoogleFonts.mukta(
+                          color: Colors.white,
+                          fontSize: 17,
+                        )),
                     Container(
                       padding: EdgeInsets.only(right: 30),
                       width: 320,
                       child: TextFormField(
                         style: GoogleFonts.mukta(color: Colors.white),
-
                         controller: emailController,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: Color.fromARGB(51, 51, 51, 0),
                           enabledBorder: const OutlineInputBorder(
                             // width: 0.0 produces a thin "hairline" border
-                            borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+                            borderSide: const BorderSide(
+                                color: Colors.grey, width: 0.0),
                           ),
                           border: const OutlineInputBorder(),
                           labelText: 'E-mail',
@@ -93,10 +84,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Text(
-                      "Password: ",
-                        style: GoogleFonts.mukta(fontSize: 17, color: Colors.white)
-                    ),
+                    Text("Password: ",
+                        style: GoogleFonts.mukta(
+                            fontSize: 17, color: Colors.white)),
                     Container(
                       padding: EdgeInsets.only(right: 30),
                       width: 320,
@@ -109,7 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           fillColor: Color.fromARGB(51, 51, 51, 0),
                           enabledBorder: const OutlineInputBorder(
                             // width: 0.0 produces a thin "hairline" border
-                            borderSide: const BorderSide(color: Colors.grey, width: 0.0),
+                            borderSide: const BorderSide(
+                                color: Colors.grey, width: 0.0),
                           ),
                           border: const OutlineInputBorder(),
                           labelText: 'Password',
@@ -121,24 +112,28 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Container(
                   padding: EdgeInsets.all(7),
-                  child: Wrap(children: <Widget>[
-                    Text(
-                      signinError,
-                      style: GoogleFonts.ubuntu(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
-
-                  ],),
+                  child: Wrap(
+                    children: <Widget>[
+                      Text(
+                        signinError,
+                        style: GoogleFonts.ubuntu(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
-                RaisedButton(
+                FlatButton(
                   color: Color.fromARGB(51, 51, 51, 0),
-                  child: Text("Sign-In", style: GoogleFonts.mukta(color: Colors.white),),
+                  child: Text(
+                    "Sign-In",
+                    style: GoogleFonts.mukta(color: Colors.white),
+                  ),
                   onPressed: () {
                     print("Pressed1.");
                     _auth
                         .signInWithEmailAndPassword(
-                        email: emailController.text.toString(),
-                        password: passController.text.toString())
+                            email: emailController.text.toString(),
+                            password: passController.text.toString())
                         .then((value) {
                       print("Successful! " + value.user.uid);
 //                      Navigator.push(
@@ -150,16 +145,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     }).catchError((e) {
                       print("Failed to Login! " + e.toString());
                       setState(() {
-                        signinError = e
-                            .toString()
-                            .replaceAll("PlatformException", "");
+                        signinError =
+                            e.toString().replaceAll("PlatformException", "");
                       });
                     });
                   },
                 ),
-                RaisedButton(
+                FlatButton(
                   color: Color.fromARGB(51, 51, 51, 0),
-                  child: Text("Don't have an account? Sign Up", style: GoogleFonts.mukta(color: Colors.white),),
+                  child: Text(
+                    "Don't have an account? Sign Up",
+                    style: GoogleFonts.mukta(color: Colors.white),
+                  ),
                   onPressed: () {
                     createAccountDialog(context).then((onValue) {
                       if (onValue == "Success") {
@@ -176,15 +173,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-
-
-
           ],
         ),
       ),
-
     );
   }
+
   Future<String> createAccountDialog(BuildContext context) {
     var emailController = TextEditingController();
     var passController = TextEditingController();
@@ -193,103 +187,135 @@ class _MyHomePageState extends State<MyHomePage> {
     return showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
+          return Dialog(
+            //contentPadding: EdgeInsets.only(left: 5.0, bottom: 5.0,),
+            //contentPadding: EdgeInsets.all(0.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(24.0)),
+            ),
+            backgroundColor: Colors.grey,
             //contentPadding: EdgeInsets.all(5.0),
-            title: Text("Create an account", style: GoogleFonts.ubuntu()),
-            content: StatefulBuilder(
-                builder: (BuildContext context, StateSetter setState) {
-                  return SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: axisSize,
-                      children: <Widget>[
-                        Container(
-                          //padding: EdgeInsets.only(right: 20),
+            //title: Text("Create an account", style: GoogleFonts.ubuntu()),
+            child: Stack(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.all(45),
+                  child: StatefulBuilder(
+                      builder: (BuildContext context, StateSetter setState) {
+                    return SingleChildScrollView(
+                      //padding: EdgeInsets.only(top: 25, right: 25),
+                      child: Column(
+                        mainAxisSize: axisSize,
+                        children: <Widget>[
+                          Container(
+                            //padding: EdgeInsets.only(right: 20),
 
-                          child: TextField(
-                            style: GoogleFonts.ubuntu(),
-                            controller: emailController,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(),
-                              labelText: 'E-mail',
+                            child: TextField(
+                              style: GoogleFonts.ubuntu(),
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(),
+                                labelText: 'E-mail',
+                              ),
                             ),
                           ),
-                        ),
 
-                        Text(
-                          "",
-                        ),
+                          Text(
+                            "",
+                          ),
 
-                        Container(
-                          child: TextField(
-                            style: GoogleFonts.ubuntu(),
-                            controller: passController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(),
-                              labelText: 'Password',
+                          Container(
+                            child: TextField(
+                              style: GoogleFonts.ubuntu(),
+                              controller: passController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(),
+                                labelText: 'Password',
+                              ),
                             ),
                           ),
-                        ),
 
-                        Container(
-                          //height: 10,
-                          padding: EdgeInsets.all(5),
-                          child: Text(errorMessage,
-                              style: GoogleFonts.ubuntu(color: Colors.red)),
-                        ),
+                          Container(
+                            //height: 10,
+                            padding: EdgeInsets.all(5),
+                            child: Text(errorMessage,
+                                style: GoogleFonts.ubuntu(color: Colors.red)),
+                          ),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            RaisedButton(
-                                child: Text("Go Back", style: GoogleFonts.ubuntu()),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              RaisedButton(
+                                  child: Text("Go Back",
+                                      style: GoogleFonts.ubuntu()),
+                                  onPressed: () {
+                                    Navigator.of(context).pop("nah");
+                                  }),
+                              RaisedButton(
+                                child: Text("Create Account",
+                                    style: GoogleFonts.ubuntu()),
                                 onPressed: () {
-                                  Navigator.of(context).pop("nah");
-                                }),
-                            RaisedButton(
-                              child: Text("Create Account",
-                                  style: GoogleFonts.ubuntu()),
-                              onPressed: () {
-                                print("Pressed2.");
+                                  print("Pressed2.");
 
-                                _auth
-                                    .createUserWithEmailAndPassword(
-                                    email: emailController.text.toString(),
-                                    password: passController.text.toString())
-                                    .then((value) {
-                                  print("Successful!");
-                                  Navigator.of(context).pop("Success");
-                                }).catchError((e) {
-                                  print("Failed to sign up! " + e.toString());
-                                  setState(() {
-                                    errorMessage = e
-                                        .toString()
-                                        .replaceAll("PlatformException", "");
-                                    print(errorMessage.replaceAll(
-                                        "PlatformException", ""));
-                                    //axisSize = MainAxisSize.values(MainAxisSize.min);
+                                  _auth
+                                      .createUserWithEmailAndPassword(
+                                          email:
+                                              emailController.text.toString(),
+                                          password:
+                                              passController.text.toString())
+                                      .then((value) {
+                                    print("Successful!");
+                                    Navigator.of(context).pop("Success");
+                                  }).catchError((e) {
+                                    print("Failed to sign up! " + e.toString());
+                                    setState(() {
+                                      errorMessage = e
+                                          .toString()
+                                          .replaceAll("PlatformException", "");
+                                      print(errorMessage.replaceAll(
+                                          "PlatformException", ""));
+                                      //axisSize = MainAxisSize.values(MainAxisSize.min);
+                                    });
                                   });
-                                });
-                              },
-                            ),
-                          ],
-                        ),
+                                },
+                              ),
+                            ],
+                          ),
 
-                        //getGenres(errorMessage),
-                      ],
+                          //getGenres(errorMessage),
+                        ],
+                      ),
+                    );
+                  }),
+                ),
+                Positioned(
+                  right: 10.0,
+                  top: 10.0,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: CircleAvatar(
+                        radius: 16.0,
+                        backgroundColor: Colors.grey,
+                        child: Icon(Icons.close, color: Colors.white),
+                      ),
                     ),
-                  );
-                }),
-
-            actions: <Widget>[],
+                  ),
+                ),
+              ],
+            ),
           );
         });
   }
-
-
-
 }
+
+
+
