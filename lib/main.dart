@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 void main() => runApp(MyApp());
 
@@ -33,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var currentUser = "Unknown";
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final DatabaseReference dataRef = FirebaseDatabase.instance.reference();
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: <Widget>[
                       Text(
                         signinError,
-                        style: GoogleFonts.ubuntu(color: Colors.white),
+                        style: GoogleFonts.mukta(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -162,9 +164,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       if (onValue == "Success") {
                         //  SnackBar movieBar =
 
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                          content: new Text("Success! Account created."),
-                        ));
+//                        Scaffold.of(context).showSnackBar(SnackBar(
+//                          content: new Text("Success! Account created."),
+//                        ));
                       }
 
                       //
@@ -182,6 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<String> createAccountDialog(BuildContext context) {
     var emailController = TextEditingController();
     var passController = TextEditingController();
+    var userController = TextEditingController();
     String errorMessage = " ";
     var axisSize = MainAxisSize.min;
     return showDialog(
@@ -211,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             //padding: EdgeInsets.only(right: 20),
 
                             child: TextField(
-                              style: GoogleFonts.ubuntu(),
+                              style: GoogleFonts.mukta(),
                               controller: emailController,
                               decoration: InputDecoration(
                                 filled: true,
@@ -228,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
                           Container(
                             child: TextField(
-                              style: GoogleFonts.ubuntu(),
+                              style: GoogleFonts.mukta(),
                               controller: passController,
                               obscureText: true,
                               decoration: InputDecoration(
@@ -240,11 +243,28 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
 
+                          Text(
+                            "",
+                          ),
+
+                          Container(
+                            child: TextField(
+                              style: GoogleFonts.mukta(),
+                              controller: userController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(),
+                                labelText: 'Username',
+                              ),
+                            ),
+                          ),
+
                           Container(
                             //height: 10,
                             padding: EdgeInsets.all(5),
                             child: Text(errorMessage,
-                                style: GoogleFonts.ubuntu(color: Colors.red)),
+                                style: GoogleFonts.mukta(color: Colors.red)),
                           ),
 
                           Row(
@@ -252,36 +272,96 @@ class _MyHomePageState extends State<MyHomePage> {
                             children: <Widget>[
                               RaisedButton(
                                   child: Text("Go Back",
-                                      style: GoogleFonts.ubuntu()),
+                                      style: GoogleFonts.mukta()),
                                   onPressed: () {
                                     Navigator.of(context).pop("nah");
                                   }),
                               RaisedButton(
                                 child: Text("Create Account",
-                                    style: GoogleFonts.ubuntu()),
+                                    style: GoogleFonts.mukta()),
                                 onPressed: () {
                                   print("Pressed2.");
 
-                                  _auth
-                                      .createUserWithEmailAndPassword(
+                                  dataRef
+                                      .child("Users/" +
+                                          userController.text.toString())
+                                      .once()
+                                      .then((ds) async {
+                                    if (ds.value == null) {
+                                      _auth
+                                          .createUserWithEmailAndPassword(
                                           email:
-                                              emailController.text.toString(),
+                                          emailController.text.toString(),
                                           password:
-                                              passController.text.toString())
-                                      .then((value) {
-                                    print("Successful!");
-                                    Navigator.of(context).pop("Success");
+                                          passController.text.toString())
+                                          .then((value) {
+                                        print("Successful! - " +
+                                            value.user.uid.toString());
+                                        print(userController.text.toString());
+                                        print(emailController.text.toString());
+
+//                                    dataRef.child("Users").orderByChild("username").equalTo(userController.text.toString()).once("value",snapshot => {
+////                                    if (snapshot.exists()){
+////
+////                                    }
+//                                    });
+
+                                        dataRef
+                                            .child("Users/" +
+                                            userController.text.toString())
+                                            .set({
+                                          "email": emailController.text.toString(),
+                                          "username":
+                                          userController.text.toString(),
+                                        }).then((res) {
+                                          print("Added");
+                                        }).catchError((e) {
+                                          print("Failed due to " + e);
+                                        });
+
+                                        Navigator.of(context).pop("Success");
+                                      }).catchError((e) {
+                                        print("Failed to sign up! " + e.toString());
+                                        setState(() {
+                                          if (e.code ==
+                                              'ERROR_EMAIL_ALREADY_IN_USE') {
+                                            errorMessage =
+                                            "ERROR. E-mail is already in use.";
+                                          }
+                                          if (e.code == 'ERROR_INVALID_EMAIL') {
+                                            errorMessage =
+                                            "ERROR. E-mail is invalid.";
+                                          }
+                                          if (e.code == 'ERROR_WEAK_PASSWORD') {
+                                            errorMessage =
+                                            "ERROR. Password is not strong enough.";
+                                          }
+
+//                                      errorMessage = e
+//                                          .toString()
+//                                          .replaceAll("PlatformException", "");
+//                                      print(errorMessage.replaceAll(
+//                                          "PlatformException", ""));
+                                          //axisSize = MainAxisSize.values(MainAxisSize.min);
+                                        });
+                                      });
+
+
+                                    }
+                                    else{
+                                      setState(() {
+                                        errorMessage = "ERROR. Username already exists.";
+                                      });
+
+                                    }
+
+
                                   }).catchError((e) {
-                                    print("Failed to sign up! " + e.toString());
-                                    setState(() {
-                                      errorMessage = e
-                                          .toString()
-                                          .replaceAll("PlatformException", "");
-                                      print(errorMessage.replaceAll(
-                                          "PlatformException", ""));
-                                      //axisSize = MainAxisSize.values(MainAxisSize.min);
-                                    });
+                                    print("Error. Already exists");
+                                    Navigator.of(context).pop("Success");
                                   });
+
+
                                 },
                               ),
                             ],
@@ -316,6 +396,3 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 }
-
-
-
