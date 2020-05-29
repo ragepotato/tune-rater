@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'myprofile.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String signinError = "";
   var currentUser = "Unknown";
   var username = " ";
+  var gravatarLink = " ";
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference dataRef = FirebaseDatabase.instance.reference();
@@ -141,24 +145,44 @@ class _MyHomePageState extends State<MyHomePage> {
                         .then((value) {
                       print("Successful! " + value.user.uid);
 
-                      dataRef.child("Emails/" + value.user.uid + "/username").once().then((ds) {
-
-
+                      dataRef
+                          .child("Emails/" + value.user.uid + "/username")
+                          .once()
+                          .then((ds) {
                         username = ds.value;
                         print("Emails/" + value.user.uid);
 
+                        dataRef
+                            .child("Users/" + username + "/gravatarLink")
+                            .once()
+                            .then((ds) {
+                          gravatarLink = ds.value;
+                          print(gravatarLink);
+                        }).catchError((e) {
+                          print("None available for " +
+                              currentUser +
+                              " --- " +
+                              e.toString());
+                        });
                       }).catchError((e) {
-                        print("None available for " + currentUser + " --- " + e.toString());
+                        print("None available for " +
+                            currentUser +
+                            " --- " +
+                            e.toString());
                       });
 
 
 
+
+
+
                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                MyProfilePage(username: username,),
-                      ));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyProfilePage(
+                              username: username, gravatarLink: gravatarLink,
+                            ),
+                          ));
                     }).catchError((e) {
                       print("Failed to Login! " + e.toString());
                       setState(() {
@@ -306,19 +330,16 @@ class _MyHomePageState extends State<MyHomePage> {
 //                                  if (!RegExp('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/').hasMatch(
 //                                      userController.text.toString())) {
 
-                        if (!validCharacters.hasMatch(userController.text.toString())){
-                          setState(() {
-                            errorMessage =
-                            "Invalid username. Must not contain spaces or special characters.";
-                          });
+                                  if (!validCharacters.hasMatch(
+                                      userController.text.toString())) {
+                                    setState(() {
+                                      errorMessage =
+                                          "Invalid username. Must not contain spaces or special characters.";
+                                    });
                                     errorMessage =
                                         "Invalid username. Must not contain spaces or special characters.";
                                     print("Bad.");
-                                  }
-
-                                  else {
-
-
+                                  } else {
                                     print("here");
                                     dataRef
                                         .child("Users/" +
@@ -354,6 +375,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 emailController.text.toString(),
                                             "username":
                                                 userController.text.toString(),
+                                            "gravatarLink":
+                                                "https://www.gravatar.com/avatar/" +
+                                                    md5
+                                                        .convert(utf8.encode(
+                                                            "Stephen.tayag@gmail.com "
+                                                                .trim()
+                                                                .toLowerCase()))
+                                                        .toString() +
+                                                    "?s=500",
                                           }).then((res) {
                                             print("Added");
                                           }).catchError((e) {
@@ -362,19 +392,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
                                           dataRef
                                               .child("Emails/" +
-                                              value.user.uid.toString())
+                                                  value.user.uid.toString())
                                               .set({
-
                                             "username":
-                                            userController.text.toString(),
+                                                userController.text.toString(),
                                           }).then((res) {
                                             print("Added");
                                           }).catchError((e) {
                                             print("Failed due to " + e);
                                           });
-
-
-
 
                                           Navigator.of(context).pop("Success");
                                         }).catchError((e) {
