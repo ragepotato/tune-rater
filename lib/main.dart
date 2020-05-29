@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'myprofile.dart';
 
 void main() => runApp(MyApp());
 
@@ -32,6 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var passController = TextEditingController();
   String signinError = "";
   var currentUser = "Unknown";
+  var username = " ";
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference dataRef = FirebaseDatabase.instance.reference();
@@ -118,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: <Widget>[
                       Text(
                         signinError,
-                        style: GoogleFonts.mukta(color: Colors.white),
+                        style: GoogleFonts.mukta(color: Colors.red),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -138,17 +140,31 @@ class _MyHomePageState extends State<MyHomePage> {
                             password: passController.text.toString())
                         .then((value) {
                       print("Successful! " + value.user.uid);
-//                      Navigator.push(
-//                        context,
-//                        MaterialPageRoute(
-//                            builder: (context) =>
-//                                MyHomePage(uid: value.user.uid)),
-//                      );
+
+                      dataRef.child("Emails/" + value.user.uid + "/username").once().then((ds) {
+
+
+                        username = ds.value;
+                        print("Emails/" + value.user.uid);
+
+                      }).catchError((e) {
+                        print("None available for " + currentUser + " --- " + e.toString());
+                      });
+
+
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                MyProfilePage(username: username,),
+                      ));
                     }).catchError((e) {
                       print("Failed to Login! " + e.toString());
                       setState(() {
-                        signinError =
-                            e.toString().replaceAll("PlatformException", "");
+                        signinError = "Incorrect username or password.";
+//                        signinError =
+//                            e.toString().replaceAll("PlatformException", "");
                       });
                     });
                   },
@@ -167,6 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
 //                        Scaffold.of(context).showSnackBar(SnackBar(
 //                          content: new Text("Success! Account created."),
 //                        ));
+
                       }
 
                       //
@@ -280,25 +297,47 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: Text("Create Account",
                                     style: GoogleFonts.mukta()),
                                 onPressed: () {
-                                  print("Pressed2.");
+                                  final validCharacters =
+                                      RegExp(r'^[a-zA-Z0-9_-]+$');
 
-                                  dataRef
-                                      .child("Users/" +
-                                          userController.text.toString())
-                                      .once()
-                                      .then((ds) async {
-                                    if (ds.value == null) {
-                                      _auth
-                                          .createUserWithEmailAndPassword(
-                                          email:
-                                          emailController.text.toString(),
-                                          password:
-                                          passController.text.toString())
-                                          .then((value) {
-                                        print("Successful! - " +
-                                            value.user.uid.toString());
-                                        print(userController.text.toString());
-                                        print(emailController.text.toString());
+                                  print("Pressed2.");
+                                  print(userController.text.toString());
+
+//                                  if (!RegExp('/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/').hasMatch(
+//                                      userController.text.toString())) {
+
+                        if (!validCharacters.hasMatch(userController.text.toString())){
+                          setState(() {
+                            errorMessage =
+                            "Invalid username. Must not contain spaces or special characters.";
+                          });
+                                    errorMessage =
+                                        "Invalid username. Must not contain spaces or special characters.";
+                                    print("Bad.");
+                                  }
+
+                                  else {
+
+
+                                    print("here");
+                                    dataRef
+                                        .child("Users/" +
+                                            userController.text.toString())
+                                        .once()
+                                        .then((ds) async {
+                                      if (ds.value == null) {
+                                        _auth
+                                            .createUserWithEmailAndPassword(
+                                                email: emailController.text
+                                                    .toString(),
+                                                password: passController.text
+                                                    .toString())
+                                            .then((value) {
+                                          print("Successful! - " +
+                                              value.user.uid.toString());
+                                          print(userController.text.toString());
+                                          print(
+                                              emailController.text.toString());
 
 //                                    dataRef.child("Users").orderByChild("username").equalTo(userController.text.toString()).once("value",snapshot => {
 ////                                    if (snapshot.exists()){
@@ -306,62 +345,77 @@ class _MyHomePageState extends State<MyHomePage> {
 ////                                    }
 //                                    });
 
-                                        dataRef
-                                            .child("Users/" +
-                                            userController.text.toString())
-                                            .set({
-                                          "email": emailController.text.toString(),
-                                          "username":
-                                          userController.text.toString(),
-                                        }).then((res) {
-                                          print("Added");
-                                        }).catchError((e) {
-                                          print("Failed due to " + e);
-                                        });
+                                          dataRef
+                                              .child("Users/" +
+                                                  userController.text
+                                                      .toString())
+                                              .set({
+                                            "email":
+                                                emailController.text.toString(),
+                                            "username":
+                                                userController.text.toString(),
+                                          }).then((res) {
+                                            print("Added");
+                                          }).catchError((e) {
+                                            print("Failed due to " + e);
+                                          });
 
-                                        Navigator.of(context).pop("Success");
-                                      }).catchError((e) {
-                                        print("Failed to sign up! " + e.toString());
-                                        setState(() {
-                                          if (e.code ==
-                                              'ERROR_EMAIL_ALREADY_IN_USE') {
-                                            errorMessage =
-                                            "ERROR. E-mail is already in use.";
-                                          }
-                                          if (e.code == 'ERROR_INVALID_EMAIL') {
-                                            errorMessage =
-                                            "ERROR. E-mail is invalid.";
-                                          }
-                                          if (e.code == 'ERROR_WEAK_PASSWORD') {
-                                            errorMessage =
-                                            "ERROR. Password is not strong enough.";
-                                          }
+                                          dataRef
+                                              .child("Emails/" +
+                                              value.user.uid.toString())
+                                              .set({
+
+                                            "username":
+                                            userController.text.toString(),
+                                          }).then((res) {
+                                            print("Added");
+                                          }).catchError((e) {
+                                            print("Failed due to " + e);
+                                          });
+
+
+
+
+                                          Navigator.of(context).pop("Success");
+                                        }).catchError((e) {
+                                          print("Failed to sign up! " +
+                                              e.toString());
+                                          setState(() {
+                                            if (e.code ==
+                                                'ERROR_EMAIL_ALREADY_IN_USE') {
+                                              errorMessage =
+                                                  "ERROR. E-mail is already in use.";
+                                            }
+                                            if (e.code ==
+                                                'ERROR_INVALID_EMAIL') {
+                                              errorMessage =
+                                                  "ERROR. E-mail is invalid.";
+                                            }
+                                            if (e.code ==
+                                                'ERROR_WEAK_PASSWORD') {
+                                              errorMessage =
+                                                  "ERROR. Password is not strong enough.";
+                                            }
 
 //                                      errorMessage = e
 //                                          .toString()
 //                                          .replaceAll("PlatformException", "");
 //                                      print(errorMessage.replaceAll(
 //                                          "PlatformException", ""));
-                                          //axisSize = MainAxisSize.values(MainAxisSize.min);
+                                            //axisSize = MainAxisSize.values(MainAxisSize.min);
+                                          });
                                         });
-                                      });
-
-
-                                    }
-                                    else{
-                                      setState(() {
-                                        errorMessage = "ERROR. Username already exists.";
-                                      });
-
-                                    }
-
-
-                                  }).catchError((e) {
-                                    print("Error. Already exists");
-                                    Navigator.of(context).pop("Success");
-                                  });
-
-
+                                      } else {
+                                        setState(() {
+                                          errorMessage =
+                                              "ERROR. Username already exists.";
+                                        });
+                                      }
+                                    }).catchError((e) {
+                                      print("Error. Already exists");
+                                      Navigator.of(context).pop("Success");
+                                    });
+                                  }
                                 },
                               ),
                             ],
