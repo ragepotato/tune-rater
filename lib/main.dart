@@ -37,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String signinError = "";
   var currentUser = "Unknown";
   var username = " ";
-  var gravatarLink = " ";
+  var gravatarPic = " ";
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseReference dataRef = FirebaseDatabase.instance.reference();
@@ -131,7 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 FlatButton(
-                  color: Color.fromARGB(51, 51, 51, 0),
+                  //color: Color.fromARGB(51, 51, 51, 0),
                   child: Text(
                     "Sign-In",
                     style: GoogleFonts.mukta(color: Colors.white),
@@ -156,8 +156,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             .child("Users/" + username + "/gravatarLink")
                             .once()
                             .then((ds) {
-                          gravatarLink = ds.value;
-                          print(gravatarLink);
+                          gravatarPic = ds.value;
+                          print("Username: " + username);
+                          print("GravatarPic: " + gravatarPic);
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyProfilePage(username: username, gravatarPic: gravatarPic,)));
+
+
+
                         }).catchError((e) {
                           print("None available for " +
                               currentUser +
@@ -176,13 +181,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MyProfilePage(
-                              username: username, gravatarLink: gravatarLink,
-                            ),
-                          ));
+
+//                      Navigator.push(
+//                          context,
+//                          MaterialPageRoute(
+//                            builder: (context) => MyProfilePage(
+//                              username: username, gravatarPic: gravatarPic,
+//                            ),
+//                          ));
                     }).catchError((e) {
                       print("Failed to Login! " + e.toString());
                       setState(() {
@@ -194,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                 ),
                 FlatButton(
-                  color: Color.fromARGB(51, 51, 51, 0),
+                  //color: Color.fromARGB(51, 51, 51, 0),
                   child: Text(
                     "Don't have an account? Sign Up",
                     style: GoogleFonts.mukta(color: Colors.white),
