@@ -30,6 +30,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   int numberSongs = 0;
   int numberFollowing = 0;
   int numberFollowers = 0;
+  var listUsers = [];
 
   _MyProfilePageState(this.username, this.gravatarPic);
 
@@ -45,160 +46,192 @@ class _MyProfilePageState extends State<MyProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Search Users"),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                listUsers = [];
+                dataRef.child("Users").once().then((ds) {
+                  ds.value.forEach((k, v) {
+                    listUsers.add(k);
+                    print(k);
+                  });
+
+                  print(listUsers.length.toString());
+                  print(listUsers.length);
+                  showSearch(context: context, delegate: DataSearch(listUsers));
+                }).catchError((e) {
+                  print("None available for " + " --- " + e.toString());
+                });
+              }),
+        ],
+      ),
+      drawer: Drawer(),
       resizeToAvoidBottomInset: false,
       backgroundColor: Color.fromARGB(51, 51, 51, 0),
       body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Text(
-                        "Albums",
-                        style: GoogleFonts.mukta(
-                            color: Colors.white, fontSize: 18),
-                      ),
-                      Text(
-                        "Ranked",
-                        style: GoogleFonts.mukta(
-                            color: Colors.white, fontSize: 18),
-                      ),
-                      Text(numberAlbums.toString(),
-                        style: GoogleFonts.mukta(
-                          color: Colors.white, fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    //mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      IconButton(
-                        icon: CircleAvatar(
-                          backgroundImage: NetworkImage(gravatarPic),
-                          radius: 80,
-                        ),
-                        onPressed: () {
-                          gravatarPic = md5
-                              .convert(utf8.encode("Stephen.tayag@gmail.com "
-                                  .trim()
-                                  .toLowerCase()))
-                              .toString();
-                          setState(() {
-                            gravatarPic = "https://www.gravatar.com/avatar/" +
-                                gravatarPic +
-                                "?s=500";
-                            print(gravatarPic);
-                          });
-
-                          expandImageDialog(context);
-                        },
-                        iconSize: 120,
-                      ),
-                      Text(
-                        username.toString(),
-                        style: GoogleFonts.mukta(
-                            color: Colors.white, fontSize: 20),
-                      ),
-                    ],
-                  ),
-                  Column(
-
-                    children: <Widget>[
-                      Text(
-                        "Songs",
-                        style: GoogleFonts.mukta(
-                            color: Colors.white, fontSize: 18),
-                      ),
-                      Text(
-                        "Ranked",
-                        style: GoogleFonts.mukta(
-                            color: Colors.white, fontSize: 18),
-                      ),
-                      Text(numberSongs.toString(),
-                        style: GoogleFonts.mukta(
-                            color: Colors.white, fontSize: 18),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                Text(
-                  "Following",
-                  style: GoogleFonts.mukta(
-                      color: Colors.white, fontSize: 18),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "Albums",
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                    Text(
+                      "Ranked",
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                    Text(
+                      numberAlbums.toString(),
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                  ],
                 ),
-                Text(numberFollowing.toString(),
-                  style: GoogleFonts.mukta(
-                      color: Colors.white, fontSize: 18),
+                Column(
+                  //mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    IconButton(
+                      icon: CircleAvatar(
+                        backgroundImage: NetworkImage(gravatarPic),
+                        radius: 80,
+                      ),
+                      onPressed: () {
+                        gravatarPic = md5
+                            .convert(utf8.encode("Stephen.tayag@gmail.com "
+                                .trim()
+                                .toLowerCase()))
+                            .toString();
+                        setState(() {
+                          gravatarPic = "https://www.gravatar.com/avatar/" +
+                              gravatarPic +
+                              "?s=500";
+                          print(gravatarPic);
+                        });
+
+                        expandImageDialog(context);
+                      },
+                      iconSize: 120,
+                    ),
+                    Text(
+                      username.toString(),
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 20),
+                    ),
+                  ],
                 ),
-              ],),
-              Column(
-                children: <Widget>[
-                  Text(
-                    "Followers",
-                    style: GoogleFonts.mukta(
-                        color: Colors.white, fontSize: 18),
-                  ),
-                  Text(numberFollowers.toString(),
-                    style: GoogleFonts.mukta(
-                        color: Colors.white, fontSize: 18),
-                  ),
-                ],),
-          ],),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              RaisedButton(child: Text("+ albums",style: GoogleFonts.mukta(
-                  fontSize: 14)),
-                onPressed: (){
-                  setState(() {
-                    numberAlbums++;
-                  });
-
-                },
-              ),
-              RaisedButton(child: Text("+ songs",style: GoogleFonts.mukta(
-                  fontSize: 14)),
-                onPressed: (){
-                  setState(() {
-                    numberSongs++;
-                  });
-
-                },
-              ),
-              RaisedButton(child: Text("+ following",style: GoogleFonts.mukta(
-                  fontSize: 14)),
-                onPressed: (){
-                  setState(() {
-                    numberFollowing++;
-                  });
-
-                },
-              ),
-              RaisedButton(child: Text("+ followers",style: GoogleFonts.mukta(
-                  fontSize: 14)),
-                onPressed: (){
-                  setState(() {
-                    numberFollowers++;
-                  });
-
-                },
-              ),
-            ],
-          )
-
-            ],
-          ),
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "Songs",
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                    Text(
+                      "Ranked",
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                    Text(
+                      numberSongs.toString(),
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "Following",
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                    Text(
+                      numberFollowing.toString(),
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                  ],
+                ),
+                Column(
+                  children: <Widget>[
+                    Text(
+                      "Followers",
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                    Text(
+                      numberFollowers.toString(),
+                      style:
+                          GoogleFonts.mukta(color: Colors.white, fontSize: 18),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                RaisedButton(
+                  child:
+                      Text("+ albums", style: GoogleFonts.mukta(fontSize: 14)),
+                  onPressed: () {
+                    setState(() {
+                      numberAlbums++;
+                    });
+                  },
+                ),
+                RaisedButton(
+                  child:
+                      Text("+ songs", style: GoogleFonts.mukta(fontSize: 14)),
+                  onPressed: () {
+                    setState(() {
+                      numberSongs++;
+                    });
+                  },
+                ),
+                RaisedButton(
+                  child: Text("+ following",
+                      style: GoogleFonts.mukta(fontSize: 14)),
+                  onPressed: () {
+                    setState(() {
+                      numberFollowing++;
+                    });
+                  },
+                ),
+                RaisedButton(
+                  child: Text("+ followers",
+                      style: GoogleFonts.mukta(fontSize: 14)),
+                  onPressed: () {
+                    setState(() {
+                      numberFollowers++;
+                    });
+                  },
+                ),
+              ],
+            ),
+            RaisedButton(
+              child: Text("Search.", style: GoogleFonts.mukta(fontSize: 14)),
+              onPressed: () {
+                setState(() {});
+              },
+            ),
+          ],
         ),
-
+      ),
     );
   }
 
@@ -225,5 +258,76 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
           );
         });
+  }
+}
+
+class DataSearch extends SearchDelegate<String> {
+  List listUsers;
+  final recentList = ["sltayag"];
+  String result = "";
+
+  DataSearch(this.listUsers);
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    // actions for app bar
+    return [
+      IconButton(
+          icon: Icon(Icons.clear),
+          onPressed: () {
+            query = "";
+          })
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    // leading icon on the left of app bar
+    return IconButton(
+        icon: AnimatedIcon(
+            icon: AnimatedIcons.menu_arrow, progress: transitionAnimation),
+        onPressed: () {
+          close(context, null);
+        });
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    // show some result based on selection
+    return Text(query);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    // show when someone searches for something
+
+    //need to ignore case sensitive
+    //should print out full username
+    final suggestionList = query.isEmpty
+        ? recentList
+        : listUsers.where((p) => p.startsWith(query)).toList();
+    return ListView.builder(
+      itemBuilder: (context, index) => ListTile(
+        onTap: (){
+
+          showResults(context);
+          print(suggestionList[index].toString());
+          query = suggestionList[index].toString();
+        },
+        leading: Icon(Icons.location_city),
+        title: RichText(
+          text: TextSpan(
+              text: suggestionList[index].substring(0, query.length),
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              children: [
+                TextSpan(
+                    text: suggestionList[index].substring(query.length),
+                    style: TextStyle(color: Colors.grey))
+              ]),
+        ),
+      ),
+      itemCount: suggestionList.length,
+    );
   }
 }
