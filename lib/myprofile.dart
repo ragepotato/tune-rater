@@ -47,6 +47,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color.fromARGB(51, 51, 51, 0),
         title: Text("Search Users"),
         actions: <Widget>[
           IconButton(
@@ -226,9 +227,30 @@ class _MyProfilePageState extends State<MyProfilePage> {
             RaisedButton(
               child: Text("Search.", style: GoogleFonts.mukta(fontSize: 14)),
               onPressed: () {
-                setState(() {});
+                setState(() {
+                  print("a");
+
+                });
               },
             ),
+            IconButton(
+                icon: Icon(Icons.search, color: Colors.white,),
+                onPressed: () {
+                  listUsers = [];
+                  dataRef.child("Users").once().then((ds) {
+                    ds.value.forEach((k, v) {
+                      listUsers.add(k);
+                      print(k);
+                    });
+
+                    print(listUsers.length.toString());
+                    print(listUsers.length);
+                    showSearch(context: context, delegate: DataSearch(listUsers));
+                  }).catchError((e) {
+                    print("None available for " + " --- " + e.toString());
+                  });
+                }),
+
           ],
         ),
       ),
@@ -262,11 +284,20 @@ class _MyProfilePageState extends State<MyProfilePage> {
 }
 
 class DataSearch extends SearchDelegate<String> {
+
+
   List listUsers;
   final recentList = ["sltayag"];
   String result = "";
 
   DataSearch(this.listUsers);
+
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    return ThemeData.dark();
+  }
+
+
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -303,31 +334,71 @@ class DataSearch extends SearchDelegate<String> {
 
     //need to ignore case sensitive
     //should print out full username
+    List<bool> _selections = List.generate(3, (_) => false);
     final suggestionList = query.isEmpty
         ? recentList
-        : listUsers.where((p) => p.startsWith(query)).toList();
-    return ListView.builder(
-      itemBuilder: (context, index) => ListTile(
-        onTap: (){
+        : listUsers.where((p) => p.startsWith(query.toLowerCase())).toList();
+    return Container(
 
-          showResults(context);
-          print(suggestionList[index].toString());
-          query = suggestionList[index].toString();
-        },
-        leading: Icon(Icons.location_city),
-        title: RichText(
-          text: TextSpan(
-              text: suggestionList[index].substring(0, query.length),
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              children: [
-                TextSpan(
-                    text: suggestionList[index].substring(query.length),
-                    style: TextStyle(color: Colors.grey))
-              ]),
+        child: Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+
+//            ToggleButtons(   // only for stateful widget
+//              children: <Widget>[
+//                Icon(Icons.ac_unit),
+//                Icon(Icons.call),
+//                Icon(Icons.cake),
+//              ],
+//              onPressed: (int index) {
+//                setState(() {
+//                  isSelected[index] = !isSelected[index];
+//                });
+//              },
+//              isSelected: isSelected,
+//            ),
+
+
+
+
+            ToggleButtons(
+              children: <Widget>[
+              Text("Albums"),
+              Text("Songs"),
+              Text("Users"),
+
+            ],
+              isSelected: _selections,
+            ),
+          ],
         ),
-      ),
-      itemCount: suggestionList.length,
-    );
+        ListView.builder(
+          shrinkWrap: true,
+          itemBuilder: (context, index) => ListTile(
+            onTap: () {
+              showResults(context);
+              print(suggestionList[index].toString());
+              query = suggestionList[index].toString();
+              recentList.insert(0, query);
+            },
+            leading: Icon(Icons.location_city),
+            title: RichText(
+              text: TextSpan(
+                  text: suggestionList[index].substring(0, query.length),
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
+                  children: [
+                    TextSpan(
+                        text: suggestionList[index].substring(query.length),
+                        style: TextStyle(color: Colors.grey))
+                  ]),
+            ),
+          ),
+          itemCount: suggestionList.length,
+        ),
+      ],
+    ));
   }
 }
