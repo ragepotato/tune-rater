@@ -44,7 +44,7 @@ class _SearchPageState extends State<SearchPage> {
         print("Value: " + value.length.toString());
         print("Here.");
         result.addAll(value);
-        resultForDisplay = result;
+
         print("Result: " + result.length.toString());
         isSelected[0] = true;
       });
@@ -70,17 +70,17 @@ class _SearchPageState extends State<SearchPage> {
                   // only for stateful widget
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.all(10),
-                      child: Text("Albums"),
+                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 30, right: 30),
+                      child: Text("Albums", style: GoogleFonts.mukta(fontSize: 16)),
                     ),
 
                     Container(
-                      padding: EdgeInsets.all(10),
-                      child: Text("Songs"),
+                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 30, right: 30),
+                      child: Text("Songs", style: GoogleFonts.mukta(fontSize: 16)),
                     ),
                     Container(
-                      padding: EdgeInsets.all(10),
-                      child: Text("Users"),
+                      padding: EdgeInsets.only(top: 10, bottom: 10, left: 30, right: 30),
+                      child: Text("Users", style: GoogleFonts.mukta(fontSize: 16)),
                     ),
                   ],
                   onPressed: (int index) {
@@ -116,7 +116,10 @@ class _SearchPageState extends State<SearchPage> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
 
-                return index == 0 ? _searchBar() : _listItem(index - 1);
+                return index == 0 ? _searchBar()  :
+
+                _listItem(index - 1);
+                //return _listItem(index - 1);
               },
               itemCount: resultForDisplay.length + 1,
             ),
@@ -149,15 +152,17 @@ class _SearchPageState extends State<SearchPage> {
         ),
 
         onFieldSubmitted: (text) {
+          var blankResult = [];
           text = text.toLowerCase();
           setState(() {
+            print("Text length: " + text.length.toString());
             resultForDisplay = result.where((note) {
+              resultForDisplay = text.length == 0 ? blankResult : result;
+
               var noteTitle = note.toLowerCase();
-
+              //resultForDisplay = result;
               highlightedSearch = text;
-              print(highlightedSearch);
-
-              return noteTitle.contains(text);
+              return  noteTitle.contains(text);
             }).toList();
           });
         },
