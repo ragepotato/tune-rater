@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:crypto/crypto.dart';
-
+import 'package:expandable/expandable.dart';
 import 'dart:convert';
 
 class MyProfilePage extends StatefulWidget {
@@ -31,6 +31,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
   int numberFollowing = 0;
   int numberFollowers = 0;
   var listUsers = [];
+  String lorem =
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec diam a nulla molestie iaculis. Integer id luctus sapien. Donec vitae risus mauris. Sed suscipit iaculis lectus eget feugiat. Sed id tristique urna. Morbi ut orci odio. Nam ante dolor, vestibulum in tempor ut, malesuada efficitur odio. Donec diam turpis, elementum non enim nec, suscipit sagittis est. Proin aliquet scelerisque sapien, sit amet convallis ligula aliquet a. Vivamus venenatis nulla vel faucibus rhoncus.";
 
   _MyProfilePageState(this.username, this.gravatarPic);
 
@@ -46,29 +48,29 @@ class _MyProfilePageState extends State<MyProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(51, 51, 51, 0),
-        title: Text("Search Users"),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                listUsers = [];
-                dataRef.child("Users").once().then((ds) {
-                  ds.value.forEach((k, v) {
-                    listUsers.add(k);
-                    print(k);
-                  });
-
-                  print(listUsers.length.toString());
-                  print(listUsers.length);
-                  showSearch(context: context, delegate: DataSearch(listUsers));
-                }).catchError((e) {
-                  print("None available for " + " --- " + e.toString());
-                });
-              }),
-        ],
-      ),
+//      appBar: AppBar(
+//        backgroundColor: Color.fromARGB(51, 51, 51, 0),
+//        title: Text("Search Users"),
+//        actions: <Widget>[
+//          IconButton(
+//              icon: Icon(Icons.search),
+//              onPressed: () {
+//                listUsers = [];
+//                dataRef.child("Users").once().then((ds) {
+//                  ds.value.forEach((k, v) {
+//                    listUsers.add(k);
+//                    print(k);
+//                  });
+//
+//                  print(listUsers.length.toString());
+//                  print(listUsers.length);
+//                  showSearch(context: context, delegate: DataSearch(listUsers));
+//                }).catchError((e) {
+//                  print("None available for " + " --- " + e.toString());
+//                });
+//              }),
+//        ],
+//      ),
       drawer: Drawer(),
       resizeToAvoidBottomInset: false,
       backgroundColor: Color.fromARGB(51, 51, 51, 0),
@@ -150,6 +152,45 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
               ],
             ),
+
+            Container(
+              padding: EdgeInsets.all(10),
+              child: ExpandableNotifier(
+                // <-- Provides ExpandableController to its children
+
+                child: Column(
+                  children: [
+                    Expandable(
+                      // <-- Driven by ExpandableController from ExpandableNotifier
+                      collapsed: ExpandableButton(
+                        // <-- Expands when tapped on the cover photo
+                        child: Text(
+                          lorem,
+                          softWrap: true,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.mukta(
+                              color: Colors.white, fontSize: 14),
+                        ),
+                      ),
+                      expanded: Column(children: [
+                        ExpandableButton(
+                          // <-- Collapses when tapped on
+                          child: Text(
+                            lorem,
+                            softWrap: true,
+                            style: GoogleFonts.mukta(
+                                color: Colors.white, fontSize: 14),
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -224,33 +265,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 ),
               ],
             ),
-            RaisedButton(
-              child: Text("Search.", style: GoogleFonts.mukta(fontSize: 14)),
-              onPressed: () {
-                setState(() {
-                  print("a");
-
-                });
-              },
-            ),
-            IconButton(
-                icon: Icon(Icons.search, color: Colors.white,),
-                onPressed: () {
-                  listUsers = [];
-                  dataRef.child("Users").once().then((ds) {
-                    ds.value.forEach((k, v) {
-                      listUsers.add(k);
-                      print(k);
-                    });
-
-                    print(listUsers.length.toString());
-                    print(listUsers.length);
-                    showSearch(context: context, delegate: DataSearch(listUsers));
-                  }).catchError((e) {
-                    print("None available for " + " --- " + e.toString());
-                  });
-                }),
-
           ],
         ),
       ),
@@ -280,125 +294,5 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
           );
         });
-  }
-}
-
-class DataSearch extends SearchDelegate<String> {
-
-
-  List listUsers;
-  final recentList = ["sltayag"];
-  String result = "";
-
-  DataSearch(this.listUsers);
-
-  @override
-  ThemeData appBarTheme(BuildContext context) {
-    return ThemeData.dark();
-  }
-
-
-
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    // actions for app bar
-    return [
-      IconButton(
-          icon: Icon(Icons.clear),
-          onPressed: () {
-            query = "";
-          })
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    // leading icon on the left of app bar
-    return IconButton(
-        icon: AnimatedIcon(
-            icon: AnimatedIcons.menu_arrow, progress: transitionAnimation),
-        onPressed: () {
-          close(context, null);
-        });
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    // show some result based on selection
-    return Text(query);
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    // show when someone searches for something
-
-    //need to ignore case sensitive
-    //should print out full username
-    List<bool> _selections = List.generate(3, (_) => false);
-    final suggestionList = query.isEmpty
-        ? recentList
-        : listUsers.where((p) => p.startsWith(query.toLowerCase())).toList();
-    return Container(
-
-        child: Column(
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-
-//            ToggleButtons(   // only for stateful widget
-//              children: <Widget>[
-//                Icon(Icons.ac_unit),
-//                Icon(Icons.call),
-//                Icon(Icons.cake),
-//              ],
-//              onPressed: (int index) {
-//                setState(() {
-//                  isSelected[index] = !isSelected[index];
-//                });
-//              },
-//              isSelected: isSelected,
-//            ),
-
-
-
-
-            ToggleButtons(
-              children: <Widget>[
-              Text("Albums"),
-              Text("Songs"),
-              Text("Users"),
-
-            ],
-              isSelected: _selections,
-            ),
-          ],
-        ),
-        ListView.builder(
-          shrinkWrap: true,
-          itemBuilder: (context, index) => ListTile(
-            onTap: () {
-              showResults(context);
-              print(suggestionList[index].toString());
-              query = suggestionList[index].toString();
-              recentList.insert(0, query);
-            },
-            leading: Icon(Icons.location_city),
-            title: RichText(
-              text: TextSpan(
-                  text: suggestionList[index].substring(0, query.length),
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
-                  children: [
-                    TextSpan(
-                        text: suggestionList[index].substring(query.length),
-                        style: TextStyle(color: Colors.grey))
-                  ]),
-            ),
-          ),
-          itemCount: suggestionList.length,
-        ),
-      ],
-    ));
   }
 }

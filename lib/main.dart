@@ -7,6 +7,7 @@ import 'searchTool.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:carousel_pro/carousel_pro.dart';
 
 void main() => runApp(MyApp());
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SearchPage(),
+      home: MyHomePage(),
     );
   }
 }
@@ -50,25 +51,55 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: Color.fromARGB(51, 51, 51, 0),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          //mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-//            Text(
-//              'You have pushed the button this many times:', style: GoogleFonts.mukta(fontSize: 15.0, color: Colors.white),
-//      ),
+
 
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(top: 15, left: 10, right: 10),
+                  child: SizedBox(
+
+                    height: 250.0,
+                    width: MediaQuery.of(context).size.width,
+                    child: Carousel(
+
+                      boxFit: BoxFit.cover,
+                      autoplay: true,
+                      animationCurve: Curves.fastOutSlowIn,
+                      animationDuration: Duration(milliseconds: 2000),
+                      dotSize: 3.0,
+                      dotIncreasedColor: Color(0xFFFF335C),
+                      dotBgColor: Colors.transparent,
+                      dotPosition: DotPosition.bottomCenter,
+                      dotVerticalPadding: 5.0,
+                      showIndicator: true,
+                      indicatorBgPadding: 7.0,
+                      images: [
+                        NetworkImage('https://lastfm.freetls.fastly.net/i/u/770x0/c10ddd30f511a41c1683ef5212e87992.webp#c10ddd30f511a41c1683ef5212e87992'),
+                        NetworkImage('https://lastfm.freetls.fastly.net/i/u/770x0/fc4c4f4eb4fa6e9215ecb6705cbb72de.webp#fc4c4f4eb4fa6e9215ecb6705cbb72de'),
+                        NetworkImage('https://lastfm.freetls.fastly.net/i/u/770x0/954aa276b464770ffc4e3c125f6bd934.webp#954aa276b464770ffc4e3c125f6bd934'),
+                        NetworkImage('https://lastfm.freetls.fastly.net/i/u/770x0/e899091e712461db7a42528f88070059.webp#e899091e712461db7a42528f88070059'),
+                        NetworkImage('https://lastfm.freetls.fastly.net/i/u/770x0/3e61c005453a9457560ff2f4a1a11b23.webp#3e61c005453a9457560ff2f4a1a11b23'),
+                        NetworkImage('https://lastfm.freetls.fastly.net/i/u/770x0/ecad9e26332eee688ed756dad9d4de82.webp#ecad9e26332eee688ed756dad9d4de82'),
+                        //ExactAssetImage("assets/images/LaunchImage.jpg"),
+                      ],
+                    ),
+                  ),
+                ),
+
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text("E-mail: ",
-                        style: GoogleFonts.mukta(
-                          color: Colors.white,
-                          fontSize: 17,
-                        )),
+//                    Text("E-mail: ",
+//                        style: GoogleFonts.mukta(
+//                          color: Colors.white,
+//                          fontSize: 17,
+//                        )),
                     Container(
-                      padding: EdgeInsets.only(right: 30),
+                      padding: EdgeInsets.only(top: 30),
                       width: 320,
                       child: TextFormField(
                         style: GoogleFonts.mukta(color: Colors.white),
@@ -91,13 +122,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Text(""),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text("Password: ",
-                        style: GoogleFonts.mukta(
-                            fontSize: 17, color: Colors.white)),
+//                    Text("Password: ",
+//                        style: GoogleFonts.mukta(
+//                            fontSize: 17, color: Colors.white)),
                     Container(
-                      padding: EdgeInsets.only(right: 30),
+                      //padding: EdgeInsets.only(right: 30),
                       width: 320,
                       child: TextField(
                         style: GoogleFonts.mukta(color: Colors.white),

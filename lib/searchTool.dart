@@ -29,7 +29,7 @@ class _SearchPageState extends State<SearchPage> {
         listUsers.add(k);
         print(k);
       });
-
+      listUsers.sort((a, b) => a.toString().compareTo(b.toString()));
       print(listUsers.length.toString());
     }).catchError((e) {
       print("None available for " + " --- " + e.toString());
@@ -49,6 +49,7 @@ class _SearchPageState extends State<SearchPage> {
         isSelected[0] = true;
       });
     });
+
     super.initState();
   }
 
@@ -157,12 +158,15 @@ class _SearchPageState extends State<SearchPage> {
           setState(() {
             print("Text length: " + text.length.toString());
             resultForDisplay = result.where((note) {
+
+              //note.startsWith(text.toLowerCase())).toList();
               resultForDisplay = text.length == 0 ? blankResult : result;
 
               var noteTitle = note.toLowerCase();
               //resultForDisplay = result;
               highlightedSearch = text;
-              return  noteTitle.contains(text);
+              return note.startsWith(text.toLowerCase());
+              //return  noteTitle.contains(text);
             }).toList();
           });
         },
