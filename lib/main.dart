@@ -8,6 +8,7 @@ import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:carousel_pro/carousel_pro.dart';
+import 'profileSettings.dart';
 
 void main() => runApp(MyApp());
 

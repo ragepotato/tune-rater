@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:crypto/crypto.dart';
 import 'package:expandable/expandable.dart';
 import 'dart:convert';
+import 'profileSettings.dart';
 
 class MyProfilePage extends StatefulWidget {
   MyProfilePage({Key key, this.title, this.username, this.gravatarPic})
@@ -31,12 +32,30 @@ class _MyProfilePageState extends State<MyProfilePage> {
   int numberFollowing = 0;
   int numberFollowers = 0;
   var listUsers = [];
-  String lorem =
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec diam a nulla molestie iaculis. Integer id luctus sapien. Donec vitae risus mauris. Sed suscipit iaculis lectus eget feugiat. Sed id tristique urna. Morbi ut orci odio. Nam ante dolor, vestibulum in tempor ut, malesuada efficitur odio. Donec diam turpis, elementum non enim nec, suscipit sagittis est. Proin aliquet scelerisque sapien, sit amet convallis ligula aliquet a. Vivamus venenatis nulla vel faucibus rhoncus.";
+  String profileBio = "";
 
   _MyProfilePageState(this.username, this.gravatarPic);
 
+  Future<String> fetchBio() async {
+    String bioPro = "";
+
+    await dataRef.child("Users/" + username.toString() + "/bio").once().then((ds) {
+      bioPro = ds.value.toString();
+
+    }).catchError((e) {
+      print("None available for " + " --- " + e.toString());
+    });
+    return bioPro;
+  }
+
+  @override
   void initState() {
+    fetchBio().then((value) {
+      setState(() {
+        profileBio = value;
+      });
+    });
+
     super.initState();
   }
 
@@ -78,7 +97,25 @@ class _MyProfilePageState extends State<MyProfilePage> {
         child: Column(
           children: <Widget>[
             Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.settings, color: Colors.white,
+                  ),
+                  onPressed: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => SettingsPage(username: username, gravatarPic: gravatarPic,)));
+                  },
+                padding: EdgeInsets.only(right: 15, top: 20),
+                ),
+
+              ],
+            ),
+
+
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
               children: <Widget>[
                 Column(
                   children: <Widget>[
@@ -154,7 +191,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
 
             Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.all(15),
               child: ExpandableNotifier(
                 // <-- Provides ExpandableController to its children
 
@@ -165,7 +202,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                       collapsed: ExpandableButton(
                         // <-- Expands when tapped on the cover photo
                         child: Text(
-                          lorem,
+                          profileBio,
                           softWrap: true,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -177,7 +214,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         ExpandableButton(
                           // <-- Collapses when tapped on
                           child: Text(
-                            lorem,
+                            profileBio,
                             softWrap: true,
                             style: GoogleFonts.mukta(
                                 color: Colors.white, fontSize: 14),
