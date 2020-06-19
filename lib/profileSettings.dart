@@ -73,6 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isEditingText = false;
   TextEditingController _editingController;
   String initialText = "yo";
+  bool textChanged = false;
 
   @override
   Widget build(BuildContext context) {
@@ -80,11 +81,27 @@ class _SettingsPageState extends State<SettingsPage> {
       backgroundColor: Color.fromARGB(51, 51, 51, 0),
       body: SingleChildScrollView(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(15),
-              child: _editTitleTextField(),
+              padding: EdgeInsets.only(right: 300, top: 25),
+              child: Text("Profile", style: GoogleFonts.mukta(color: Colors.grey, fontSize: 16), ),
             ),
+
+            Container(
+
+              padding: EdgeInsets.only(bottom: 20, left: 20, right: 20),
+              child:  Container(
+                color: Colors.grey,
+                padding: EdgeInsets.only(left: 15, right: 15),
+              child:
+
+              _editTitleTextField(),
+              ),
+            ),
+
+            _saveText(),
+
             RaisedButton(
 
               child: Text("Save", style: GoogleFonts.mukta(color: Colors.white, fontSize: 16),),
@@ -92,6 +109,39 @@ class _SettingsPageState extends State<SettingsPage> {
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyProfilePage(username: username, gravatarPic: gravatarPic,)));
               },
             ),
+
+//            ExpandableNotifier(
+//              // <-- Provides ExpandableController to its children
+//
+//              child: Column(
+//                children: [
+//                  Expandable(
+//                    // <-- Driven by ExpandableController from ExpandableNotifier
+//                    collapsed: ExpandableButton(
+//                      // <-- Expands when tapped on the cover photo
+//                      child: Text(
+//                        "Press here",
+//                        softWrap: true,
+//                        maxLines: 2,
+//                        overflow: TextOverflow.ellipsis,
+//                        style: GoogleFonts.mukta(
+//                            color: Colors.white, fontSize: 14),
+//                      ),
+//                    ),
+//                    expanded: Column(children: [
+//                      ExpandableButton(
+//                        // <-- Collapses when tapped on
+//                        child: _editTitleTextField(),
+//                      ),
+//                    ]),
+//                  ),
+//                ],
+//              ),
+//            ),
+
+
+
+
           ],
         ),
 
@@ -99,20 +149,44 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _saveText(){
+    if (textChanged){
+
+      return Text("Save?", style: GoogleFonts.mukta(color: Colors.white, fontSize: 16),);
+    }
+    else{
+
+      return SizedBox.shrink();
+    }
+
+  }
+
+
+
   Widget _editTitleTextField() {
     if (_isEditingText)
       return Center(
+
         child: TextField(
+          onChanged: (newValue){
+            setState(() {
+              textChanged = true;
+            });
+          },
+
+
           onSubmitted: (newValue) {
             setState(() {
               initialText = newValue;
               _isEditingText = false;
+              textChanged = false;
               FirebaseDatabase.instance.reference().child("Users/" + username).update(
                 {
 
                   "bio" : newValue,
                 }
               ).then((value){
+
                 print("Saved: " + newValue);
               }).catchError((error){
                 print("Error: " + error.toString());
@@ -130,6 +204,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       );
     return InkWell(
+
       onTap: () {
         setState(() {
           _isEditingText = true;

@@ -156,8 +156,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
                               "?s=500";
                           print(gravatarPic);
                         });
-
-                        expandImageDialog(context);
+                        _openCustomDialog();
+                        //expandImageDialog(context);
                       },
                       iconSize: 120,
                     ),
@@ -332,4 +332,42 @@ class _MyProfilePageState extends State<MyProfilePage> {
           );
         });
   }
+
+  void _openCustomDialog() {
+    showGeneralDialog(barrierColor: Colors.black.withOpacity(0.5),
+        transitionBuilder: (context, a1, a2, widget) {
+          return Transform.scale(
+            scale: a1.value,
+            child: Opacity(
+              opacity: a1.value,
+              child: AlertDialog(
+                contentPadding: EdgeInsets.all(0.0),
+                backgroundColor: Color.fromARGB(51, 51, 51, 0),
+                content: Card(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          child: Image(
+                            image: NetworkImage(gravatarPic),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+        transitionDuration: Duration(milliseconds: 200),
+        barrierDismissible: true,
+        barrierLabel: '',
+        context: context,
+        pageBuilder: (context, animation1, animation2) {});
+  }
+
+
+
 }
